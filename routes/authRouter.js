@@ -26,13 +26,15 @@ const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      throw new Error("Please provide email and password");
+      throw new Error("Please provide correct email and password");
 
     const user = await User.findOne({ email });
 
-    const validPass = await bcrypt.compare(password, user.password);
-
-    if (!validPass) throw new Error("Invalid authentification. Try again!");
+    if (!user || !(await user.correctPassword(password))) {
+      const error = new Error("Incorrect credentials!");
+      error.status = 401;
+      throw error;
+    }
 
     res.status(200).json({
       status: "success",

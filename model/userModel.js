@@ -33,6 +33,10 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+userSchema.methods.correctPassword = async function (candidatePW) {
+  return await bcrypt.compare(candidatePW, this.password);
+};
+
 const User = mongoose.model("User", userSchema);
 
 export default User;
